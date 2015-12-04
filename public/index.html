@@ -18,11 +18,6 @@
     // To get started with this tutorial running your own code, simply remove
     // the script tag loading scripts/example.js and start writing code here.
 
-    var data =[
-      {id: 1, author: "Pete Hunt", text: "This is one comment"},
-      {id: 2, author: "Jordan Walke", text: "This is *anothoer* comment"}
-    ]
-
     var Comment = React.createClass({
       rawMarkup: function() {
         var rawMarkup = marked(this.props.children.toString(), {sanitize: true});
@@ -42,11 +37,34 @@
     });
 
     var CommentBox = React.createClass({
+      loadCommentsFromSerevr: function() {
+        $.ajax({
+          url: this.props.url,
+          dataType: 'json',
+          cache: false,
+          success: function(data) {
+            this.setState({data: data});
+          }.bind(this),
+          error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+          }.bind(this)
+        });
+      },
+
+      getInitialState: function() {
+        return {data: []};
+      },
+
+      componentDidMount: function () {
+        this.loadCommentsFromSerevr();
+        setInterval(this.loadCommentsFromSerevr, this.props.pollInterval);
+      },
+
       render: function() {
         return (
           <div className="commentBox">
             <h1>Comments</h1>
-            <CommentList data={this.props.data}/>
+            <CommentList data={this.state.data}/>
             <CommentForm />
           </div>
         );
@@ -81,7 +99,7 @@
     });
 
     ReactDOM.render(
-      <CommentBox data={data}/>,
+        <CommentBox url="/api/comments" pollInterval={2000} />,
       document.getElementById('content')
     );
     </script>
