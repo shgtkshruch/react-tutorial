@@ -18,6 +18,19 @@
     // To get started with this tutorial running your own code, simply remove
     // the script tag loading scripts/example.js and start writing code here.
 
+    var Comment = React.createClass({
+      render: function() {
+        return (
+          <div className="comment">
+            <h2 className="commentAuthor">
+              {this.props.author}
+            </h2>
+            {this.props.children}
+          </div>
+        );
+      }
+    });
+
     var CommentBox = React.createClass({
       render: function() {
         return (
